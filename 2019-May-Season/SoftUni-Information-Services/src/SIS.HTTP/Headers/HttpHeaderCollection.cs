@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SIS.Common;
 using SIS.HTTP.Common;
+using SIS.HTTP.Headers.Contracts;
 
 namespace SIS.HTTP.Headers
 {
@@ -16,23 +16,26 @@ namespace SIS.HTTP.Headers
 
         public void AddHeader(HttpHeader header)
         {
-            header.ThrowIfNull(nameof(header));
+            CoreValidator.ThrowIfNull(header, nameof(header));
             this.httpHeaders.Add(header.Key, header);
         }
 
         public bool ContainsHeader(string key)
         {
-            key.ThrowIfNullOrEmpty(nameof(key));
+            CoreValidator.ThrowIfNullOrEmpty(key, nameof(key));
             return this.httpHeaders.ContainsKey(key);
         }
 
         public HttpHeader GetHeader(string key)
         {
-            key.ThrowIfNullOrEmpty(nameof(key));
+            CoreValidator.ThrowIfNullOrEmpty(key, nameof(key));
+
+            //TODO: Validate for existing parameter (maybe throw exception)
+
             return this.httpHeaders[key];
         }
 
-        public override string ToString() => string.Join("\r\n",
+        public override string ToString() => string.Join(GlobalConstants.HttpNewLine,
             this.httpHeaders.Values.Select(header => header.ToString()));
 
     }

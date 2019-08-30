@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using SIS.Common;
-using SIS.HTTP.Common;
+﻿using SIS.HTTP.Common;
+using SIS.HTTP.Sessions.Contracts;
+using System;
+using System.Collections.Generic;
 
 namespace SIS.HTTP.Sessions
 {
@@ -10,35 +11,19 @@ namespace SIS.HTTP.Sessions
 
         public HttpSession(string id)
         {
-            this.Id = id;
             this.IsNew = true;
             this.sessionParameters = new Dictionary<string, object>();
+            this.Id = id;
         }
 
         public string Id { get; }
 
         public bool IsNew { get; set; }
 
-        public object GetParameter(string parameterName)
-        {
-            parameterName.ThrowIfNullOrEmpty(nameof(parameterName));
-
-            // TODO: Validation for existing parameter (maybe throw exception)
-
-            return this.sessionParameters[parameterName];
-        }
-
-        public bool ContainsParameter(string parameterName)
-        {
-            parameterName.ThrowIfNullOrEmpty(nameof(parameterName));
-
-            return this.sessionParameters.ContainsKey(parameterName);
-        }
-
         public void AddParameter(string parameterName, object parameter)
         {
-            parameterName.ThrowIfNullOrEmpty(nameof(parameterName));
-            parameter.ThrowIfNull(nameof(parameter));
+            CoreValidator.ThrowIfNullOrEmpty(parameterName, nameof(parameter));
+            CoreValidator.ThrowIfNull(parameter, nameof(parameter));
 
             this.sessionParameters[parameterName] = parameter;
         }
@@ -46,6 +31,21 @@ namespace SIS.HTTP.Sessions
         public void ClearParameters()
         {
             this.sessionParameters.Clear();
+        }
+
+        public bool ContainsParameter(string parameterName)
+        {
+            CoreValidator.ThrowIfNullOrEmpty(parameterName, nameof(parameterName));
+            return this.sessionParameters.ContainsKey(parameterName);
+        }
+
+        public object GetParameter(string parameterName)
+        {
+            CoreValidator.ThrowIfNullOrEmpty(parameterName, nameof(parameterName));
+
+            //TODO: Validate for existing parameter (maybe throw exception)
+            
+            return this.sessionParameters[parameterName];
         }
     }
 }

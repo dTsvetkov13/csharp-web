@@ -1,11 +1,13 @@
-﻿using System.Text;
-using SIS.Common;
+﻿using System;
+using System.Linq;
+using System.Text;
 using SIS.HTTP.Common;
 using SIS.HTTP.Cookies;
-using SIS.HTTP.Cookies.Contracts;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Extensions;
 using SIS.HTTP.Headers;
+using SIS.HTTP.Headers.Contracts;
+using SIS.HTTP.Responses.Contracts;
 
 namespace SIS.HTTP.Responses
 {
@@ -20,7 +22,7 @@ namespace SIS.HTTP.Responses
 
         public HttpResponse(HttpResponseStatusCode statusCode) : this()
         {
-            statusCode.ThrowIfNull(nameof(statusCode));
+            CoreValidator.ThrowIfNull(statusCode, nameof(statusCode));
             this.StatusCode = statusCode;
         }
 
@@ -28,24 +30,24 @@ namespace SIS.HTTP.Responses
 
         public IHttpHeaderCollection Headers { get; }
 
-        public IHttpCookieCollection Cookies { get; }
-
         public byte[] Content { get; set; }
 
-        public void AddHeader(HttpHeader header)
-        {
-            this.Headers.AddHeader(header);
-        }
+        public IHttpCookieCollection Cookies { get; }
 
         public void AddCookie(HttpCookie cookie)
         {
             this.Cookies.AddCookie(cookie);
         }
 
+        public void AddHeader(HttpHeader header)
+        {
+            this.Headers.AddHeader(header);
+        }
+
         public byte[] GetBytes()
         {
             byte[] httpResponseBytesWithoutBody = Encoding.UTF8.GetBytes(this.ToString());
-
+            
             byte[] httpResponseBytesWithBody = new byte[httpResponseBytesWithoutBody.Length + this.Content.Length];
 
             for (int i = 0; i < httpResponseBytesWithoutBody.Length; i++)

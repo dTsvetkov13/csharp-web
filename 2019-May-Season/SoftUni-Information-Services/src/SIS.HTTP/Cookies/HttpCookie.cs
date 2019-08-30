@@ -1,33 +1,33 @@
-﻿using System;
-using System.Text;
-using SIS.Common;
-
-namespace SIS.HTTP.Cookies
+﻿namespace SIS.HTTP.Cookies
 {
+    using System;
+    using System.Text;
+    using SIS.HTTP.Common;
+
     public class HttpCookie
     {
         private const int HttpCookieDefaultExpirationDays = 3;
-
         private const string HttpCookieDefaultPath = "/";
 
-        public HttpCookie(string key, string value, int expires = HttpCookieDefaultExpirationDays,
-            string path = HttpCookieDefaultPath) : this(key, value, true, expires, path)
+        public HttpCookie(string key, string value,
+            int expires = HttpCookieDefaultExpirationDays, string path = HttpCookieDefaultPath)
         {
-        }
-
-        public HttpCookie(string key, string value, bool isNew, int expires = HttpCookieDefaultExpirationDays,
-            string path = HttpCookieDefaultPath)
-
-        {
-            key.ThrowIfNullOrEmpty(nameof(key));
-            value.ThrowIfNullOrEmpty(nameof(value));
+            CoreValidator.ThrowIfNullOrEmpty(key, nameof(key));
+            CoreValidator.ThrowIfNullOrEmpty(value, nameof(value));
 
             this.Key = key;
             this.Value = value;
+            this.IsNew = true;
+            this.Path = path;
             this.Expires = DateTime.UtcNow.AddDays(expires);
-			this.Path = path;
         }
 
+        public HttpCookie(string key, string value, bool isNew,
+            int expires = HttpCookieDefaultExpirationDays, string path = HttpCookieDefaultPath)
+            : this(key, value, expires, path)
+        {
+            this.IsNew = isNew;
+        }
 
         public string Key { get; }
 
@@ -48,9 +48,9 @@ namespace SIS.HTTP.Cookies
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            sb.Append($"{this.Key}={this.Value}; Expires={this.Expires:R}");
+            sb.Append($"{this.Key}={this.Value}; Expires={this.Expires.ToString("R")}");
 
             if (this.HttpOnly)
             {
